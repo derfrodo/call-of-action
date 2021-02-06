@@ -1,6 +1,6 @@
 {
     "name": "@derfrodo/call-of-action",
-    "version": "0.1.37",
+    "version": "0.0.1",
     "description": "",
     "repository": {
         "type": "git",
@@ -12,7 +12,7 @@
         "cleanForPublish": "node cleanForPublish.js",
         "test": "jest",
         "test:watch": "jest --watch",
-        "clean": "npm ci && node clean.js",
+        "clean": "npm ci && node clean.js && npm run installPeerDependencies",
         "build": "tsc --project tsconfig.build.json",
         "buildWatch": "tsc -w --project tsconfig.build.json",
         "prebuild": "npm run clean",

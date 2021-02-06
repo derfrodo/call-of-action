@@ -8,6 +8,9 @@ if (fs.existsSync("./.git")) {
 if (fs.existsSync("./.github")) {
     fs.remove("./.github");
 }
+if (fs.existsSync("../.github")) {
+    fs.remove("../.github");
+}
 fs.remove("./.vscode");
 fs.remove("./node_modules");
 fs.remove("clean.js");

@@ -1,0 +1,7 @@
+export const SYNC_STATE_ACTION_TYPE = "SyncStateAction";
+export const SYNC_STATE_ACTION_SOURCE_WEBAPP = "WebApp";
+export const SYNC_STATE_ACTION_SOURCE_FRAME = "Frame";
+export const SYNC_STATE_ACTION_SOURCES = {
+    webApp: SYNC_STATE_ACTION_SOURCE_WEBAPP,
+    frame: SYNC_STATE_ACTION_SOURCE_FRAME,
+};

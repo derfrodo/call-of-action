@@ -1,11 +1,16 @@
 import { useCallback } from "react";
-import { ContextAction, createSyncStateAction, SYNC_STATE_ACTION_SOURCE_FRAME } from "..";
+import {
+    ContextAction,
+    createSyncStateAction,
+    SYNC_STATE_ACTION_SOURCE_FRAME,
+} from "..";
 import { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
 
 export const useHybridReactNativeSendMessageToWebApp = <
     T extends ContextAction
 >(
-    webViewRef: ReactNativeWebViewRef
+    webViewRef: ReactNativeWebViewRef,
+    targetOrigin?: string
 ) => {
     const postMessageJavascriptCode = useCallback((action: T) => {
         const syncStateAction = createSyncStateAction(
@@ -15,7 +20,11 @@ export const useHybridReactNativeSendMessageToWebApp = <
 
         return `window.postMessage(${JSON.stringify(
             JSON.stringify(syncStateAction)
-        )}, window.location.origin)`;
+        )}, ${
+            typeof targetOrigin === "string"
+                ? `"${targetOrigin}"`
+                : "window.location.origin"
+        })`;
     }, []);
 
     return useCallback(

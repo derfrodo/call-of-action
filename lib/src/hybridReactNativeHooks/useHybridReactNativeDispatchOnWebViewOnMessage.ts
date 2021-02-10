@@ -1,17 +1,26 @@
-import { useCallback } from "react";
-import { ContextAction, SyncStateAction, SYNC_STATE_ACTION_SOURCE_WEBAPP } from "..";
+import { useCallback, Dispatch } from "react";
+import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import { ActionTypeguard } from "../types/ActionTypeguard";
+import { ContextAction } from "../types/ContextAction";
+import { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";
+import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import { SyncStateAction } from "../types/SyncStateAction";
 import { useReactNativeWebViewOnMessage } from "./useHybridReactNativeWebViewOnMessage";
 
-export const useHybridReactNativeDispatchOnWebViewOnMessage = <
-    T extends ContextAction
->(
-    dispatch: React.Dispatch<T>,
-    isActionTypeguard: (data: any) => data is T,
-    options?: { onError?: (error: any) => Promise<void> | void }
+type UseHybridReactNativeDispatchOnWebViewOnMessage = <T extends ContextAction>(
+    dispatch: Dispatch<T>,
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
+) => (evt: ReactNativeOnMessageEvent) => Promise<void>;
+
+export const useHybridReactNativeDispatchOnWebViewOnMessage: UseHybridReactNativeDispatchOnWebViewOnMessage = (
+    dispatch,
+    isActionTypeguard,
+    options
 ) => {
     const { onError } = options || {};
     const callback = useCallback(
-        (action: SyncStateAction<T>) => {
+        (action: SyncStateAction<Parameters<typeof dispatch>[0]>) => {
             try {
                 if (
                     action !== null &&

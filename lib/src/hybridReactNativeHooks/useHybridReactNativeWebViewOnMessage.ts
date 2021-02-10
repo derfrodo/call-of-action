@@ -1,21 +1,35 @@
 import { useCallback } from "react";
-import { ContextAction, SyncStateAction, asSyncStateAction } from "..";
+import { asSyncStateAction } from "../syncState/syncState";
+import { ActionTypeguard } from "../types/ActionTypeguard";
+import { ContextAction } from "../types/ContextAction";
+import { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";
+import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import { SyncStateActionCallback } from "../types/SyncStateActionCallback";
 
-export const useHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
-    onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
-    isActionTypeguard: (data: any) => data is T,
-    options?: { onError?: (error: any) => Promise<void> | void }
+type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
+    onMessage: SyncStateActionCallback<T>,
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
+) => (evt: ReactNativeOnMessageEvent) => Promise<void>;
+
+export const useHybridReactNativeWebViewOnMessage: UseHybridReactNativeWebViewOnMessage = (
+    onMessage,
+    isActionTypeguard,
+    options
 ) => {
     const { onError } = options || {};
-    const callback = useCallback(
-        (event: { nativeEvent: { data: string } }) => {
+
+    const callback = useCallback<
+        (evt: ReactNativeOnMessageEvent) => Promise<void>
+    >(
+        async (event: ReactNativeOnMessageEvent) => {
             try {
                 const action = asSyncStateAction(
                     event?.nativeEvent?.data,
                     isActionTypeguard
                 );
                 if (action !== null) {
-                    onMessage(action);
+                    await onMessage(action);
                 }
             } catch (err) {
                 console.error("Failed to react on sync state action event", {

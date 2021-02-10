@@ -1,10 +1,10 @@
 import { useCallback, Dispatch } from "react";
-import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
-import { ActionTypeguard } from "../types/ActionTypeguard";
-import { ContextAction } from "../types/ContextAction";
-import { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";
-import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
-import { SyncStateAction } from "../types/SyncStateAction";
+import type { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import type { ActionTypeguard } from "../types/ActionTypeguard";
+import type { ContextAction } from "../types/ContextAction";
+import type { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";
+import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import type { SyncStateAction } from "../types/SyncStateAction";
 import { useReactNativeWebViewOnMessage } from "./useHybridReactNativeWebViewOnMessage";
 
 type UseHybridReactNativeDispatchOnWebViewOnMessage = <T extends ContextAction>(

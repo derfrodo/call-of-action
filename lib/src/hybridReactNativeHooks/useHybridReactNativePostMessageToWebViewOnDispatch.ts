@@ -1,23 +1,46 @@
 import { useCallback, useEffect } from "react";
-import { ContextAction, IPostMessageToReactNativeContext, OnContextDispatchWillBeCalled } from "..";
+import { ContextAction } from "../types/ContextAction";
+import { IPostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
 import { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
+import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { useSendReactNativeMessageToWebApp } from "./useHybridReactNativeSendMessageToWebApp";
+
+type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
+    webViewRef: ReactNativeWebViewRef,
+    context: IPostMessageToReactNativeContext<T>,
+    targetOrigin?: string,
+    options?: SharedStateHookOptions
+) => void;
 
 /**
  * Use this method to enable post message on non bubbled actions for react native
  * @param callback callback which will be called dispatch gets called
  */
-export const useHybridReactNativePostMessageToWebViewOnDispatch = <
+export const useHybridReactNativePostMessageToWebViewOnDispatch: UseHybridReactNativeWebViewOnMessage = <
     T extends ContextAction
 >(
     webViewRef: ReactNativeWebViewRef,
-    context: IPostMessageToReactNativeContext<T>
+    context: IPostMessageToReactNativeContext<T>,
+    targetOrigin?: string,
+    options?: SharedStateHookOptions
 ) => {
-    const sendMessage = useSendReactNativeMessageToWebApp<T>(webViewRef);
+    const sendMessage = useSendReactNativeMessageToWebApp(
+        webViewRef,
+        targetOrigin,
+        options
+    );
+    const { onError } = options || {};
     const onDispatch = useCallback<OnContextDispatchWillBeCalled<T>>(
-        (action) => {
-            if (!action.isBubbled) {
-                sendMessage({ ...action, isBubbled: true });
+        async (action: T) => {
+            try {
+                if (!action.isBubbled) {
+                    await sendMessage({ ...action, isBubbled: true });
+                }
+            } catch (err) {
+                if (onError) {
+                    onError(err);
+                }
             }
         },
         [sendMessage]
@@ -31,7 +54,7 @@ export const useHybridReactNativePostMessageToWebViewOnDispatch = <
     useEffect(() => {
         if (onDispatch) {
             listenOnDispatchWillBeCalled(onDispatch);
-            return () => {
+            return (): void => {
                 removeOnDispatchWillBeCalled(onDispatch);
             };
         }

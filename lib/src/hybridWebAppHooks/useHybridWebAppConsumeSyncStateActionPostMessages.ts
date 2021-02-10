@@ -1,16 +1,28 @@
 import { useCallback, useEffect } from "react";
-import { ContextAction, SyncStateAction, asSyncStateAction } from "..";
+import { asSyncStateAction } from "../syncState/syncState";
+import { ActionTypeguard } from "../types/ActionTypeguard";
+import { ContextAction } from "../types/ContextAction";
+import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import { SyncStateAction } from "../types/SyncStateAction";
+
+type UseHybridWebAppConsumeSyncStateActionPostMessages = <
+    T extends ContextAction
+>(
+    onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
+) => void;
 
 /**
  * Use this method to consume post messages with SyncStateActions
  * @param callback callback which will be called dispatch gets called
  */
-export const useHybridWebAppConsumeSyncStateActionPostMessages = <
+export const useHybridWebAppConsumeSyncStateActionPostMessages: UseHybridWebAppConsumeSyncStateActionPostMessages = <
     T extends ContextAction
 >(
     onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
-    isActionTypeguard: (data: any) => data is T,
-    options?: { onError?: (error: any) => Promise<void> | void }
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
 ) => {
     const { onError } = options || {};
     const postMessageCallback = useCallback(
@@ -54,7 +66,11 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages = <
         }
         try {
             // for iOS
-            (document as any).addEventListener("message", postMessageCallback);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ((document as unknown) as any).addEventListener(
+                "message",
+                postMessageCallback
+            );
         } catch (err) {
             console.warn(
                 "Failed to register message events on document (iOS)",
@@ -64,7 +80,7 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages = <
             );
         }
 
-        return () => {
+        return (): void => {
             try {
                 window.removeEventListener(
                     "message",
@@ -78,7 +94,8 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages = <
             }
             try {
                 // for iOS
-                (document as any).removeEventListener(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ((document as unknown) as any).removeEventListener(
                     "message",
                     postMessageCallback
                 );

@@ -4,10 +4,12 @@ import {
     SYNC_STATE_ACTION_SOURCE_FRAME,
 } from "../constants";
 import type { SyncStateAction, SyncActionSources } from "../types";
+import type { ActionTypeguard } from "../types/ActionTypeguard";
 
 export const isSyncStateAction = <T>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: any,
-    payloadTypeGuard: (payload: any) => payload is T
+    payloadTypeGuard: ActionTypeguard<T>
 ): obj is SyncStateAction<T> => {
     return (
         typeof obj === "object" &&
@@ -19,8 +21,9 @@ export const isSyncStateAction = <T>(
 };
 
 export const asSyncStateAction = <T>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: any,
-    payloadTypeGuard: (payload: any) => payload is T
+    payloadTypeGuard: ActionTypeguard<T>
 ): SyncStateAction<T> | null => {
     try {
         const fromObj = isSyncStateAction(obj, payloadTypeGuard) ? obj : null;

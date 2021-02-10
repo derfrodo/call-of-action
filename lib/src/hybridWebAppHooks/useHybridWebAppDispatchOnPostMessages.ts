@@ -1,19 +1,27 @@
 import { useCallback } from "react";
-import {
-    ContextAction,
-    SyncStateAction,
-    SYNC_STATE_ACTION_SOURCE_WEBAPP,
-} from "..";
+import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import { ActionTypeguard } from "../types/ActionTypeguard";
+import { ContextAction } from "../types/ContextAction";
+import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import { SyncStateAction } from "../types/SyncStateAction";
 import { useConsumeSyncStateActionPostMessages } from "./useHybridWebAppConsumeSyncStateActionPostMessages";
+
+type UseHybridWebAppDispatchOnPostMessages = <T extends ContextAction>(
+    dispatch: React.Dispatch<T>,
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
+) => void;
 
 /**
  * Use this method to consume post messages and dispatch them using given parameters
  * @param callback callback which will be called dispatch gets called
  */
-export const useHybridWebAppDispatchOnPostMessages = <T extends ContextAction>(
+export const useHybridWebAppDispatchOnPostMessages: UseHybridWebAppDispatchOnPostMessages = <
+    T extends ContextAction
+>(
     dispatch: React.Dispatch<T>,
-    isActionTypeguard: (data: any) => data is T,
-    options?: { onError?: (error: any) => Promise<void> | void }
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: SharedStateHookOptions
 ) => {
     const { onError } = options || {};
     const callback = useCallback(

@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from "react";
 import { asSyncStateAction } from "../syncState/syncState";
-import { ActionTypeguard } from "../types/ActionTypeguard";
-import { ContextAction } from "../types/ContextAction";
-import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
-import { SyncStateAction } from "../types/SyncStateAction";
+import type { ActionTypeguard } from "../types/ActionTypeguard";
+import type { ContextAction } from "../types/ContextAction";
+import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import type { SyncStateAction } from "../types/SyncStateAction";
 
 type UseHybridWebAppConsumeSyncStateActionPostMessages = <
     T extends ContextAction

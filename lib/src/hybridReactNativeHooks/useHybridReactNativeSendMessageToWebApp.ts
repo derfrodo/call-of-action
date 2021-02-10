@@ -19,7 +19,7 @@ export const useHybridReactNativeSendMessageToWebApp = <
     targetOrigin?: string,
     options?: SharedStateHookOptions
 ): ((action: T) => Promise<void>) => {
-    const postMessageJavascriptCode = useCallback((action: T) => {
+    const createPostMessageJavascriptCode = useCallback((action: T) => {
         const syncStateAction = createSyncStateAction(
             action,
             SYNC_STATE_ACTION_SOURCE_FRAME
@@ -36,7 +36,7 @@ export const useHybridReactNativeSendMessageToWebApp = <
 
     const { onError } = options || {};
     return useCallback(
-        (action: T) => {
+        async (action: T) => {
             try {
                 const { current } = webViewRef || {};
                 if (!current) {
@@ -44,8 +44,8 @@ export const useHybridReactNativeSendMessageToWebApp = <
                         "Can not inject javascript into webview. No webview has been resolved."
                     );
                 } else {
-                    const js = postMessageJavascriptCode(action);
-                    current.injectJavaScript(js);
+                    const js = createPostMessageJavascriptCode(action);
+                    await current.injectJavaScript(js);
                 }
             } catch (err) {
                 if (onError) {
@@ -53,7 +53,7 @@ export const useHybridReactNativeSendMessageToWebApp = <
                 }
             }
         },
-        [postMessageJavascriptCode, webViewRef]
+        [createPostMessageJavascriptCode, webViewRef]
     );
 };
 export const useSendReactNativeMessageToWebApp = useHybridReactNativeSendMessageToWebApp;

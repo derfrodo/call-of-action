@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import type { ContextAction } from "../types/ContextAction";
-import type { IPostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
 import type { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
 import type { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
 import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
@@ -8,7 +8,7 @@ import { useSendReactNativeMessageToWebApp } from "./useHybridReactNativeSendMes
 
 type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
     webViewRef: ReactNativeWebViewRef,
-    context: IPostMessageToReactNativeContext<T>,
+    context: PostMessageToReactNativeContext<T>,
     targetOrigin?: string,
     options?: SharedStateHookOptions
 ) => void;
@@ -21,7 +21,7 @@ export const useHybridReactNativePostMessageToWebViewOnDispatch: UseHybridReactN
     T extends ContextAction
 >(
     webViewRef: ReactNativeWebViewRef,
-    context: IPostMessageToReactNativeContext<T>,
+    context: PostMessageToReactNativeContext<T>,
     targetOrigin?: string,
     options?: SharedStateHookOptions
 ) => {

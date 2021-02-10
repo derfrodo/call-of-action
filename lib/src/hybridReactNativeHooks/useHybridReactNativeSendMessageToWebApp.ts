@@ -2,13 +2,13 @@ import { useCallback } from "react";
 import { SYNC_STATE_ACTION_SOURCE_FRAME } from "../constants";
 import { createSyncStateAction } from "../syncState/syncState";
 import type { ContextAction } from "../types/ContextAction";
-import type { IPostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
 import type { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
 import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 
 type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
     webViewRef: ReactNativeWebViewRef,
-    context: IPostMessageToReactNativeContext<T>,
+    context: PostMessageToReactNativeContext<T>,
     options?: SharedStateHookOptions
 ) => void;
 

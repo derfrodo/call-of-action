@@ -1,4 +1,4 @@
-import { SyncActionSources } from "./SyncActionSources";
+import type { SyncActionSources } from "./SyncActionSources";
 
 export interface SyncStateAction<T> {
     type: "SyncStateAction";

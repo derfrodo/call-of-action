@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import {
     ContextAction,
-    IPostMessageToReactNativeContext,
+    PostMessageToReactNativeContext,
     OnContextDispatchWillBeCalled,
     createSyncStateAction,
     SYNC_STATE_ACTION_SOURCE_WEBAPP,
@@ -15,7 +15,7 @@ import {
 export const useHybridWebAppPostMessageToReactNativeOnDispatch = <
     T extends ContextAction
 >(
-    context: IPostMessageToReactNativeContext<T>,
+    context: PostMessageToReactNativeContext<T>,
     options?: { onError?: (error: any) => Promise<void> | void }
 ) => {
     const { onError } = options || {};

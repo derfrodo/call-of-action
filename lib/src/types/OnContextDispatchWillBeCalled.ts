@@ -1,4 +1,4 @@
-import { ContextAction } from "./ContextAction";
+import type { ContextAction } from "./ContextAction";
 
 export type OnContextDispatchWillBeCalled<T extends ContextAction> = (
     action: T

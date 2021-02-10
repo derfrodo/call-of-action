@@ -1,7 +1,7 @@
-import { ContextAction } from "./ContextAction";
-import { OnContextDispatchWillBeCalled } from "./OnContextDispatchWillBeCalled";
+import type { ContextAction } from "./ContextAction";
+import type { OnContextDispatchWillBeCalled } from "./OnContextDispatchWillBeCalled";
 
-export interface IPostMessageToReactNativeContext<T extends ContextAction> {
+export interface PostMessageToReactNativeContext<T extends ContextAction> {
     dispatch: React.Dispatch<T>;
     listenOnDispatchWillBeCalled: (
         callback: OnContextDispatchWillBeCalled<T>

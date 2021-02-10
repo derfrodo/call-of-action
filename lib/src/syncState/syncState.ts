@@ -8,7 +8,7 @@ import type { SyncStateAction, SyncActionSources } from "../types";
 export const isSyncStateAction = <T>(
     obj: any,
     payloadTypeGuard: (payload: any) => payload is T
-) => {
+): obj is SyncStateAction<T> => {
     return (
         typeof obj === "object" &&
         obj.type === SYNC_STATE_ACTION_TYPE &&

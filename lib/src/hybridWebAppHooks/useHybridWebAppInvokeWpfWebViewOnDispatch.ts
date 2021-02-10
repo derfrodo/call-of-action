@@ -1,22 +1,25 @@
 import { useCallback, useEffect } from "react";
-import {
-    ContextAction,
-    PostMessageToReactNativeContext,
-    OnContextDispatchWillBeCalled,
-    createSyncStateAction,
-    SYNC_STATE_ACTION_SOURCE_WEBAPP,
-} from "..";
-import { WpfWebviewWindow } from "../types/WpfWebviewWindow";
+import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import { createSyncStateAction } from "../syncState/syncState";
+import { ContextAction } from "../types/ContextAction";
+import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import type { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
+import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import type { WpfWebviewWindow } from "../types/WpfWebviewWindow";
 
+type UseHybridWebAppInvokeWpfWebViewOnDispatch = <T extends ContextAction>(
+    context: PostMessageToReactNativeContext<T>,
+    options?: SharedStateHookOptions
+) => void;
 /**
  * Use this method to invoke wpf webview with sync state actions
  * @param callback callback which will be called dispatch gets called
  */
-export const useHybridWebAppInvokeWpfWebViewOnDispatch = <
+export const useHybridWebAppInvokeWpfWebViewOnDispatch: UseHybridWebAppInvokeWpfWebViewOnDispatch = <
     T extends ContextAction
 >(
     context: PostMessageToReactNativeContext<T>,
-    options?: { onError?: (error: any) => Promise<void> | void }
+    options?: SharedStateHookOptions
 ) => {
     const { onError } = options || {};
     const onDispatch = useCallback<OnContextDispatchWillBeCalled<T>>(
@@ -52,7 +55,7 @@ export const useHybridWebAppInvokeWpfWebViewOnDispatch = <
     useEffect(() => {
         if (onDispatch) {
             listenOnDispatchWillBeCalled(onDispatch);
-            return () => {
+            return (): void => {
                 removeOnDispatchWillBeCalled(onDispatch);
             };
         }

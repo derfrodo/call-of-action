@@ -1,22 +1,28 @@
 import { useCallback, useEffect } from "react";
-import {
-    ContextAction,
-    PostMessageToReactNativeContext,
-    OnContextDispatchWillBeCalled,
-    createSyncStateAction,
-    SYNC_STATE_ACTION_SOURCE_WEBAPP,
-    ReactNativeWebviewWindow,
-} from "..";
+import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import { createSyncStateAction } from "../syncState/syncState";
+import type { ContextAction } from "../types/ContextAction";
+import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import type { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
+import type { ReactNativeWebviewWindow } from "../types/ReactNativeWebviewWindow";
+import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+
+type UseHybridWebAppPostMessageToReactNativeOnDispatch = <
+    T extends ContextAction
+>(
+    context: PostMessageToReactNativeContext<T>,
+    options?: SharedStateHookOptions
+) => void;
 
 /**
  * Use this method to enable post message on non bubbled actions for react native
  * @param callback callback which will be called dispatch gets called
  */
-export const useHybridWebAppPostMessageToReactNativeOnDispatch = <
+export const useHybridWebAppPostMessageToReactNativeOnDispatch: UseHybridWebAppPostMessageToReactNativeOnDispatch = <
     T extends ContextAction
 >(
     context: PostMessageToReactNativeContext<T>,
-    options?: { onError?: (error: any) => Promise<void> | void }
+    options?: SharedStateHookOptions
 ) => {
     const { onError } = options || {};
     const onDispatch = useCallback<OnContextDispatchWillBeCalled<T>>(
@@ -54,7 +60,7 @@ export const useHybridWebAppPostMessageToReactNativeOnDispatch = <
     useEffect(() => {
         if (onDispatch) {
             listenOnDispatchWillBeCalled(onDispatch);
-            return () => {
+            return (): void => {
                 removeOnDispatchWillBeCalled(onDispatch);
             };
         }

@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from "react";
-import { ContextAction } from "../types/ContextAction";
-import { IPostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
-import { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
-import { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
-import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import type { ContextAction } from "../types/ContextAction";
+import type { IPostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
+import type { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";
+import type { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
+import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { useSendReactNativeMessageToWebApp } from "./useHybridReactNativeSendMessageToWebApp";
 
 type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(

@@ -1,5 +1,5 @@
 import { useCallback, Dispatch } from "react";
-import type { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
+import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
 import type { ContextAction } from "../types/ContextAction";
 import type { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";

@@ -23,7 +23,7 @@
         "prepublish:public": "npm run prepareForPublish",
         "publish:beta": "npm publish --access public --tag beta",
         "publish:public": "npm publish --access public",
-        "installPeerDependencies": "npm i --no-save react @types/react"
+        "installPeerDependencies": "npm i --no-save  @types/react-dom @types/react react react-dom react-test-renderer"
     },
     "author": "Stefan Pauka",
     "license": "MIT",
@@ -35,10 +35,16 @@
     },
     "peerDependencies": {
         "@types/react": "*",
-        "react": "*"
+        "@types/react-dom": "*",
+        "react": "*",
+        "react-dom": "*",
+        "react-test-renderer": "*"
     },
     "peerDependenciesMeta": {
         "@types/react": {
+            "optional": true
+        },
+        "@types/react-dom": {
             "optional": true
         }
     },
@@ -49,6 +55,7 @@
         "@babel/preset-env": "*",
         "@babel/preset-react": "*",
         "@babel/preset-typescript": "*",
+        "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^11.2.5",
         "@testing-library/react-hooks": "^5.0.3",
         "@types/fs-extra": "^8.1.0",

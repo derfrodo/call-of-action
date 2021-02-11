@@ -3,7 +3,7 @@ import { useHybridWebAppConsumeSyncStateActionPostMessages } from "./useHybridWe
 import { renderHook } from "@testing-library/react-hooks";
 import { ActionTypeguard, SyncStateAction } from "../types";
 
-const makeWrapper = (): React.FC => ({ children }) => <>{children}</>;
+const makeWrapper = (): React.FC => ({ children }) => <div>{children}</div>;
 
 type TestActionClass = { isBubbled?: boolean };
 describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {

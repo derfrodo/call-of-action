@@ -101,6 +101,37 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
             expect.anything()
         );
     });
+    it("when called and failed on binding document message event, then hook will still listen on window events", async () => {
+        const onMessage = jest.fn<
+            void | Promise<void>,
+            [SyncStateAction<TestActionClass>]
+        >();
+
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        documentEventListenerMock.mockImplementation((a1) => {
+            if (a1 === "message") {
+                throw new Error("Testerror");
+            }
+        });
+        const { result } = renderHook(
+            () =>
+                useHybridWebAppConsumeSyncStateActionPostMessages(
+                    onMessage,
+                    isActionTypeguard
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+        expect(documentEventListenerMock).toBeCalled();
+        expect(windowEventListenerMock).toBeCalledWith(
+            "message",
+            expect.anything(),
+            undefined
+        );
+    });
     it("when called, it returns void", async () => {
         const onMessage = jest.fn<
             void | Promise<void>,

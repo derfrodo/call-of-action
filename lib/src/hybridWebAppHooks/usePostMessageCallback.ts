@@ -1,0 +1,55 @@
+import { useCallback } from "react";
+import { asSyncStateAction } from "../syncState/syncState";
+import type { ActionTypeguard } from "../types/ActionTypeguard";
+import type { ContextAction } from "../types/ContextAction";
+import type { PostMessageCallbackoptions } from "../types/PostMessageCallbackoptions";
+import type { SyncStateAction } from "../types/SyncStateAction";
+
+type UsePostMessageCallback = <T extends ContextAction>(
+    onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
+    isActionTypeguard: ActionTypeguard<T>,
+    options?: PostMessageCallbackoptions
+) => (event: MessageEvent) => void | Promise<void>;
+
+export const usePostMessageCallback: UsePostMessageCallback = <
+    T extends ContextAction
+>(
+    onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
+    isActionTypeguard: ActionTypeguard<T>,
+    postMessageCallbackOptions?: PostMessageCallbackoptions
+) => {
+    const { onError, compareSourceToWindow } = postMessageCallbackOptions || {};
+    const postMessageCallback = useCallback<
+        (event: MessageEvent) => void | Promise<void>
+    >(
+        (event: MessageEvent) => {
+            try {
+                const { data, origin, source } = event;
+                if (origin !== window.location.origin) {
+                    console.debug("Processing posted event: Origin differs", {
+                        eventOrigin: origin,
+                    });
+                    return;
+                }
+                if (!compareSourceToWindow || source !== window) {
+                    console.debug("Processing posted event: Source differs", {
+                        eventOrigin: origin,
+                    });
+                    return;
+                }
+
+                const action = asSyncStateAction(data, isActionTypeguard);
+                if (action !== null) {
+                    onMessage(action);
+                }
+            } catch (err) {
+                console.error("Processing post event failed", { error: err });
+                if (onError) {
+                    onError(err);
+                }
+            }
+        },
+        [isActionTypeguard, onError, onMessage]
+    );
+    return postMessageCallback;
+};

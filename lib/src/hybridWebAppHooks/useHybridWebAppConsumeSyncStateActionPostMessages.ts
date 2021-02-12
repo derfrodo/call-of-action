@@ -1,16 +1,16 @@
 import { useCallback, useEffect } from "react";
-import { asSyncStateAction } from "../syncState/syncState";
+import type { PostMessageCallbackoptions } from "../types/PostMessageCallbackoptions";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
 import type { ContextAction } from "../types/ContextAction";
-import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import type { SyncStateAction } from "../types/SyncStateAction";
+import { usePostMessageCallback } from "./usePostMessageCallback";
 
 type UseHybridWebAppConsumeSyncStateActionPostMessages = <
     T extends ContextAction
 >(
     onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: SharedStateHookOptions
+    options?: PostMessageCallbackoptions
 ) => void;
 
 /**
@@ -22,38 +22,12 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages: UseHybridWebAppC
 >(
     onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: SharedStateHookOptions
+    options?: PostMessageCallbackoptions
 ) => {
-    const { onError } = options || {};
-    const postMessageCallback = useCallback(
-        (event: MessageEvent) => {
-            try {
-                const { data, origin, source } = event;
-                if (origin !== window.location.origin) {
-                    console.debug("Processing posted event: Origin differs", {
-                        eventOrigin: origin,
-                    });
-                    return;
-                }
-                if (source !== window) {
-                    console.debug("Processing posted event: Source differs", {
-                        eventOrigin: origin,
-                    });
-                    return;
-                }
-
-                const action = asSyncStateAction(data, isActionTypeguard);
-                if (action !== null) {
-                    onMessage(action);
-                }
-            } catch (err) {
-                console.error("Processing post event failed", { error: err });
-                if (onError) {
-                    onError(err);
-                }
-            }
-        },
-        [isActionTypeguard, onError, onMessage]
+    const postMessageCallback = usePostMessageCallback(
+        onMessage,
+        isActionTypeguard,
+        { compareSourceToWindow: true, ...(options ?? {}) }
     );
 
     const registerCallback = useCallback(() => {

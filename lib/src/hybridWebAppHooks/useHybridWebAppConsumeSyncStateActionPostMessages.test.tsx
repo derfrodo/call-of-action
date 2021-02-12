@@ -223,4 +223,32 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         expect(mockCallback).toBeCalledTimes(1);
         expect(mockCallback).toBeCalledWith(testEvent);
     });
+    it("when message event occures on document (iOS webview), then hook calls usePostMessageCallback result", async () => {
+        const testEvent: MessageEvent = new MessageEvent("message", {
+            data: "TEST DATA!",
+        });
+        const mockCallback = jest.fn();
+        usePostMessageCallbackMock.mockImplementation(() => mockCallback);
+
+        renderHook(() =>
+            useHybridWebAppConsumeSyncStateActionPostMessages(
+                jest.fn(),
+                (jest.fn() as unknown) as ActionTypeguard<TestActionClass>
+            )
+        );
+        const callback = documentEventListenerMock.mock.calls.filter(
+            (c) => c[0] === "message"
+        )[0][1];
+
+        if (typeof callback === "function") {
+            // since we only let usePostMessageCallbackMock return a function, the else branch should never be entered
+            callback(testEvent);
+        } else {
+            // callback.handleEvent();
+            fail("We expect the mock of post message to return a function");
+        }
+
+        expect(mockCallback).toBeCalledTimes(1);
+        expect(mockCallback).toBeCalledWith(testEvent);
+    });
 });

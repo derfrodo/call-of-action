@@ -165,13 +165,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         );
         expect(result.current).toBeUndefined();
     });
-    it("when message event occures on window, then hook calls usePostMessageCallback", async () => {
-        const testEvent: MessageEvent = new MessageEvent("message", {
-            data: "TEST DATA!",
-        });
-        const mockCallback = jest.fn();
-        usePostMessageCallbackMock.mockImplementation(() => mockCallback);
-
+    it("when called, then hook calls usePostMessageCallback with its parameters", async () => {
         const onMessage = jest.fn<
             void | Promise<void>,
             [SyncStateAction<TestActionClass>]
@@ -180,16 +174,39 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
             ActionTypeguard<TestActionClass>
         >;
+        const testoptions = {};
 
-        const { result } = renderHook(
+        renderHook(
             () =>
                 useHybridWebAppConsumeSyncStateActionPostMessages(
                     onMessage,
-                    isActionTypeguard
+                    isActionTypeguard,
+                    testoptions
                 ),
             {
                 wrapper: makeWrapper(),
             }
+        );
+
+        expect(usePostMessageCallbackMock).toBeCalledTimes(1);
+        expect(usePostMessageCallbackMock).toBeCalledWith(
+            onMessage,
+            isActionTypeguard,
+            testoptions
+        );
+    });
+    it("when message event occures on window, then hook calls usePostMessageCallback result", async () => {
+        const testEvent: MessageEvent = new MessageEvent("message", {
+            data: "TEST DATA!",
+        });
+        const mockCallback = jest.fn();
+        usePostMessageCallbackMock.mockImplementation(() => mockCallback);
+
+        renderHook(() =>
+            useHybridWebAppConsumeSyncStateActionPostMessages(
+                jest.fn(),
+                (jest.fn() as unknown) as ActionTypeguard<TestActionClass>
+            )
         );
         const callback = windowEventListenerMock.mock.calls.filter(
             (c) => c[0] === "message"
@@ -199,8 +216,8 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
             // since we only let usePostMessageCallbackMock return a function, the else branch should never be entered
             callback(testEvent);
         } else {
-            fail("We expect the mock of post message to return a function");
             // callback.handleEvent();
+            fail("We expect the mock of post message to return a function");
         }
 
         expect(mockCallback).toBeCalledTimes(1);

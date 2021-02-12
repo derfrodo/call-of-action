@@ -19,12 +19,22 @@ type TestActionClass = { isBubbled?: boolean };
 const windowEventListenerMock: jest.MockedFunction<typeof window.addEventListener> = jest.fn();
 const documentEventListenerMock: jest.MockedFunction<typeof window.addEventListener> = jest.fn();
 
+const windowRemoveEventListenerMock: jest.MockedFunction<typeof window.removeEventListener> = jest
+    .fn()
+    .mockImplementation(() => {});
+const documentRemoveEventListenerMock: jest.MockedFunction<typeof window.removeEventListener> = jest
+    .fn()
+    .mockImplementation(() => {});
+
 describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
     beforeEach(() => {
         window.addEventListener = windowEventListenerMock;
         (document as any).addEventListener = documentEventListenerMock;
+        window.removeEventListener = windowRemoveEventListenerMock;
+        (document as any).removeEventListener = documentRemoveEventListenerMock;
         usePostMessageCallbackMock.mockImplementation(() => () => {});
     });
+
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -112,6 +122,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
             expect.anything()
         );
     });
+
     it("when called and failed on binding document message event, then hook will still listen on window events", async () => {
         const onMessage = jest.fn<
             void | Promise<void>,
@@ -143,6 +154,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
             undefined
         );
     });
+
     it("when called, then hook returns void", async () => {
         const onMessage = jest.fn<
             void | Promise<void>,
@@ -165,6 +177,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         );
         expect(result.current).toBeUndefined();
     });
+
     it("when called, then hook calls usePostMessageCallback with its parameters", async () => {
         const onMessage = jest.fn<
             void | Promise<void>,
@@ -195,6 +208,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
             testoptions
         );
     });
+
     it("when message event occures on window, then hook calls usePostMessageCallback result", async () => {
         const testEvent: MessageEvent = new MessageEvent("message", {
             data: "TEST DATA!",
@@ -223,6 +237,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         expect(mockCallback).toBeCalledTimes(1);
         expect(mockCallback).toBeCalledWith(testEvent);
     });
+
     it("when message event occures on document (iOS webview), then hook calls usePostMessageCallback result", async () => {
         const testEvent: MessageEvent = new MessageEvent("message", {
             data: "TEST DATA!",
@@ -250,5 +265,30 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
 
         expect(mockCallback).toBeCalledTimes(1);
         expect(mockCallback).toBeCalledWith(testEvent);
+    });
+
+    it("when unmounting removing message listeners, then hook returns void", async () => {
+        const mockCallback = jest.fn();
+        usePostMessageCallbackMock.mockImplementation(() => mockCallback);
+        const { result, unmount } = renderHook(
+            () =>
+                useHybridWebAppConsumeSyncStateActionPostMessages(
+                    jest.fn(),
+                    (jest.fn() as unknown) as ActionTypeguard<TestActionClass>
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+        unmount();
+        expect(windowRemoveEventListenerMock).toBeCalledWith(
+            "message",
+            mockCallback,
+            undefined
+        );
+        expect(documentRemoveEventListenerMock).toBeCalledWith(
+            "message",
+            mockCallback
+        );
     });
 });

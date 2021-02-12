@@ -18,7 +18,8 @@ export const usePostMessageCallback: UsePostMessageCallback = <
     isActionTypeguard: ActionTypeguard<T>,
     postMessageCallbackOptions?: PostMessageCallbackoptions
 ) => {
-    const { onError, compareSourceToWindow } = postMessageCallbackOptions || {};
+    const { onError, skipCompareSourceToWindow } =
+        postMessageCallbackOptions || {};
     const postMessageCallback = useCallback<
         (event: MessageEvent) => void | Promise<void>
     >(
@@ -31,7 +32,7 @@ export const usePostMessageCallback: UsePostMessageCallback = <
                     });
                     return;
                 }
-                if (!compareSourceToWindow || source !== window) {
+                if (skipCompareSourceToWindow === true || source !== window) {
                     console.debug("Processing posted event: Source differs", {
                         eventOrigin: origin,
                     });

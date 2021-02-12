@@ -267,7 +267,7 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         expect(mockCallback).toBeCalledWith(testEvent);
     });
 
-    it("when unmounting removing message listeners, then hook returns void", async () => {
+    it("when unmounting, then hook removes listeners.", async () => {
         const mockCallback = jest.fn();
         usePostMessageCallbackMock.mockImplementation(() => mockCallback);
         const { result, unmount } = renderHook(
@@ -289,6 +289,38 @@ describe("Given useHybridWebAppConsumeSyncStateActionPostMessages", () => {
         expect(documentRemoveEventListenerMock).toBeCalledWith(
             "message",
             mockCallback
+        );
+    });
+    it("when unmounting, then hook calls remove handlers as often as add handlers", async () => {
+        const mockCallback = jest.fn();
+        usePostMessageCallbackMock.mockImplementation(() => mockCallback);
+        const { result, unmount } = renderHook(
+            () =>
+                useHybridWebAppConsumeSyncStateActionPostMessages(
+                    jest.fn(),
+                    (jest.fn() as unknown) as ActionTypeguard<TestActionClass>
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+        unmount();
+        expect(
+            windowRemoveEventListenerMock.mock.calls.filter(
+                (c) => c[0] === "message"
+            ).length
+        ).toBe(
+            windowEventListenerMock.mock.calls.filter((c) => c[0] === "message")
+                .length
+        );
+        expect(
+            documentRemoveEventListenerMock.mock.calls.filter(
+                (c) => c[0] === "message"
+            ).length
+        ).toBe(
+            documentEventListenerMock.mock.calls.filter(
+                (c) => c[0] === "message"
+            ).length
         );
     });
 });

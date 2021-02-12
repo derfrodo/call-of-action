@@ -27,7 +27,7 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages: UseHybridWebAppC
     const postMessageCallback = usePostMessageCallback(
         onMessage,
         isActionTypeguard,
-        { skipCompareSourceToWindow: true, ...(options ?? {}) }
+        options
     );
 
     const registerCallback = useCallback(() => {

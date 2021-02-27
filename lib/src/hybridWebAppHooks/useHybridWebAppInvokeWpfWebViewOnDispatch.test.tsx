@@ -38,6 +38,8 @@ const makeWrapper = (): React.FC<any> => ({ children }): React.ReactElement => (
 );
 type TestActionClass = { isBubbled?: boolean };
 
+const notifyMock = jest.fn();
+
 describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
     beforeEach(() => {
         useConsumeSyncStateActionPostMessagesMock.mockImplementation(
@@ -144,7 +146,6 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
 
         const testOptions: SharedStateHookOptions = {};
         let onDispatch: OnContextDispatchWillBeCalled<TestActionClass>;
-
         beforeEach(() => {
             const {} = renderHook(
                 () =>
@@ -176,6 +177,28 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
                 expect.objectContaining({ ...testAction, isBubbled: true }),
                 SYNC_STATE_ACTION_SOURCE_WEBAPP
             );
+        });
+        it("... and action is not bubbled, then callback creates sync action", async () => {
+            const testAction: TestActionClass = { isBubbled: false };
+
+            onDispatch(testAction);
+
+            expect(createSyncStateAction).toBeCalledWith(
+                expect.objectContaining({ ...testAction, isBubbled: true }),
+                SYNC_STATE_ACTION_SOURCE_WEBAPP
+            );
+        });
+        it("... and action is not bubbled, then callback calls wpf notify function", async () => {
+            const testAction: TestActionClass = { isBubbled: false };
+            if ((window as any).external) {
+                (window as any).external.notify = notifyMock;
+            } else {
+                (window as any).external = { notify: notifyMock };
+            }
+
+            onDispatch(testAction);
+
+            expect(notifyMock).toBeCalled();
         });
     });
 });

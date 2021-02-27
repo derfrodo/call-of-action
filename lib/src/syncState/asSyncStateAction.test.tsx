@@ -4,7 +4,6 @@ import {
     SYNC_STATE_ACTION_TYPE,
 } from "../constants";
 import { ActionTypeguard, SyncActionSources, SyncStateAction } from "../types";
-import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { asSyncStateAction } from "./asSyncStateAction";
 import { isSyncStateAction } from "./isSyncStateAction";
 
@@ -57,7 +56,6 @@ describe("Given asSyncStateAction", () => {
         `...,when obj is %s and isSyncStateActionMock returns obj: %s`,
         (obj, synResult, expected) => {
             it(`..., then result is ${expected}.`, async () => {
-                const testOptions: SharedStateHookOptions = {};
                 const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
                     ActionTypeguard<TestActionClass>
                 >;
@@ -66,7 +64,6 @@ describe("Given asSyncStateAction", () => {
                 expect(result).toBe(expected ? obj : null);
             });
             it(`..., then result for stringified is ${expected}.`, async () => {
-                const testOptions: SharedStateHookOptions = {};
                 const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
                     ActionTypeguard<TestActionClass>
                 >;
@@ -77,9 +74,35 @@ describe("Given asSyncStateAction", () => {
                     JSON.stringify(obj),
                     isActionTypeguard
                 );
-                expect(result).toEqual(
-                    expected ? obj : null
+                expect(result).toEqual(expected ? obj : null);
+            });
+            it(`... and exception in first sync state test, then result is null.`, async () => {
+                const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+                    ActionTypeguard<TestActionClass>
+                >;
+                isSyncStateActionMock.mockImplementation(() => {
+                    throw "TESTERROR";
+                });
+                const result = asSyncStateAction(
+                    JSON.stringify(obj),
+                    isActionTypeguard
                 );
+                expect(result).toEqual(null);
+            });
+            it(`... and exception in later sync state test, then result for stringified is null.`, async () => {
+                const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+                    ActionTypeguard<TestActionClass>
+                >;
+                isSyncStateActionMock
+                    .mockImplementationOnce(() => false)
+                    .mockImplementation(() => {
+                        throw "TESTERROR";
+                    });
+                const result = asSyncStateAction(
+                    JSON.stringify(obj),
+                    isActionTypeguard
+                );
+                expect(result).toEqual(null);
             });
         }
     );

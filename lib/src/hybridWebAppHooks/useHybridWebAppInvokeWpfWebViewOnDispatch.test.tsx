@@ -157,7 +157,9 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
             removeOnDispatchWillBeCalled: jest.fn(),
         };
 
-        const testOptions: SharedStateHookOptions = {};
+        const testOptions: SharedStateHookOptions = {
+            onError: jest.fn(),
+        };
         let onDispatch: OnContextDispatchWillBeCalled<TestActionClass>;
         beforeEach(() => {
             const {} = renderHook(
@@ -206,7 +208,31 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
             addNotifyMockToWindow();
             onDispatch(testAction);
 
-            expect(notifyMock).toBeCalled();
+            expect(notifyMock).toBeCalledWith(
+                JSON.stringify({
+                    payload: "TESTPAYLOAD",
+                    source: SYNC_STATE_ACTION_SOURCE_WEBAPP,
+                    type: "SyncStateAction",
+                })
+            );
+        });
+        it("... and action is not bubbled and notify failes, then callback calls onError if present", async () => {
+            const testAction: TestActionClass = { isBubbled: false };
+            addNotifyMockToWindow();
+            notifyMock.mockImplementation(() => {
+                throw "TESTERROR";
+            });
+            onDispatch(testAction);
+            expect(testOptions.onError).toBeCalledWith("TESTERROR");
+        });
+        it("... and action is not bubbled and create sync action failes, then callback calls onError if present", async () => {
+            const testAction: TestActionClass = { isBubbled: false };
+            addNotifyMockToWindow();
+            createSyncStateActionMock.mockImplementation(() => {
+                throw "TESTERROR";
+            });
+            onDispatch(testAction);
+            expect(testOptions.onError).toBeCalledWith("TESTERROR");
         });
     });
 });

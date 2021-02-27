@@ -24,23 +24,32 @@ export const useHybridWebAppInvokeWpfWebViewOnDispatch: UseHybridWebAppInvokeWpf
     const { onError } = options || {};
     const onDispatch = useCallback<OnContextDispatchWillBeCalled<T>>(
         (action) => {
-            if (!action.isBubbled) {
-                const syncStateAction = createSyncStateAction(
-                    { ...action, isBubbled: true },
-                    SYNC_STATE_ACTION_SOURCE_WEBAPP
-                );
-                const wpfWindow = (window as unknown) as WpfWebviewWindow;
-                try {
-                    if (wpfWindow.external) {
-                        wpfWindow.external.notify(
-                            JSON.stringify(syncStateAction)
-                        );
+            try {
+                if (!action.isBubbled) {
+                    const syncStateAction = createSyncStateAction(
+                        { ...action, isBubbled: true },
+                        SYNC_STATE_ACTION_SOURCE_WEBAPP
+                    );
+                    const wpfWindow = (window as unknown) as WpfWebviewWindow;
+                    try {
+                        if (wpfWindow.external) {
+                            wpfWindow.external.notify(
+                                JSON.stringify(syncStateAction)
+                            );
+                        }
+                    } catch (err) {
+                        console.error("Failed to notify wpf frame", {
+                            error: err,
+                        });
+                        if (onError) {
+                            onError(err);
+                        }
                     }
-                } catch (err) {
-                    console.error("Failed to notify wpf frame", { error: err });
-                    if (onError) {
-                        onError(err);
-                    }
+                }
+            } catch (err) {
+                console.error("Create sync action failed", { error: err });
+                if (onError) {
+                    onError(err);
                 }
             }
         },

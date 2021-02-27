@@ -164,4 +164,48 @@ describe("Given useHybridWebAppDispatchOnPostMessages", () => {
         await callback(action);
         expect(dispatch).toBeCalled();
     });
+    it("when callback called and an error occures, then on Error will be called if present in options,", async () => {
+        const dispatch = jest
+            .fn<
+                ReturnType<React.Dispatch<TestActionClass>>,
+                Parameters<React.Dispatch<TestActionClass>>
+            >()
+            .mockImplementation(() => {
+                throw new Error("testerror for dispatch");
+            });
+
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        const testOptions: SharedStateHookOptions = {
+            onError: jest.fn(),
+        };
+
+        const {} = renderHook(
+            () =>
+                useHybridWebAppDispatchOnPostMessages(
+                    dispatch,
+                    isActionTypeguard,
+                    testOptions
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+
+        const callback =
+            useConsumeSyncStateActionPostMessagesMock.mock.calls[0][0];
+        const action: SyncStateAction<TestActionClass> = createSyncStateAction<
+            TestActionClass
+        >(
+            {
+                isBubbled: true,
+            },
+            SYNC_STATE_ACTION_SOURCE_FRAME
+        );
+
+        await callback(action);
+        expect(dispatch).toBeCalled();
+        expect(testOptions.onError).toBeCalled();
+    });
 });

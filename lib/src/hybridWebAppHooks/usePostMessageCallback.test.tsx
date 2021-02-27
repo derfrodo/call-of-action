@@ -51,4 +51,23 @@ describe("Given usePostMessageCallback", () => {
         });
         expect(typeof result.current).toBe("function");
     });
+
+    describe("when called and function returned", () => {
+        const testOptions: SharedStateHookOptions = {};
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        const onMessage = jest.fn();
+
+        it("when called and function returned, then hook returns function", async () => {
+            const { result } = renderHook<
+                Parameters<typeof usePostMessageCallback>,
+                ReturnType<typeof usePostMessageCallback>
+            >((args) => usePostMessageCallback(...args), {
+                wrapper: makeWrapper(),
+                initialProps: [onMessage, isActionTypeguard, testOptions],
+            });
+            expect(typeof result.current).toBe("function");
+        });
+    });
 });

@@ -32,7 +32,7 @@ export const usePostMessageCallback: UsePostMessageCallback = <
                     });
                     return;
                 }
-                if (skipCompareSourceToWindow === true || source !== window) {
+                if (skipCompareSourceToWindow !== true && source !== window) {
                     console.debug("Processing posted event: Source differs", {
                         eventOrigin: origin,
                     });

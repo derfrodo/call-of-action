@@ -13,6 +13,7 @@ export const isSyncStateAction = <T>(
 ): obj is SyncStateAction<T> => {
     return (
         typeof obj === "object" &&
+        obj !== null &&
         obj.type === SYNC_STATE_ACTION_TYPE &&
         (obj.source === SYNC_STATE_ACTION_SOURCE_WEBAPP ||
             obj.source === SYNC_STATE_ACTION_SOURCE_FRAME) &&

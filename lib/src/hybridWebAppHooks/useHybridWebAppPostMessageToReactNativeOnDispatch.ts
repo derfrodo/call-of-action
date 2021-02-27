@@ -27,27 +27,34 @@ export const useHybridWebAppPostMessageToReactNativeOnDispatch: UseHybridWebAppP
     const { onError } = options || {};
     const onDispatch = useCallback<OnContextDispatchWillBeCalled<T>>(
         (action) => {
-            const origin = document.location.origin || window.location.origin;
-            if (!action.isBubbled) {
-                const syncStateAction = createSyncStateAction(
-                    { ...action, isBubbled: true },
-                    SYNC_STATE_ACTION_SOURCE_WEBAPP
-                );
-                window.postMessage(syncStateAction, origin);
-                const rnWindow = window as ReactNativeWebviewWindow;
-                if (
-                    rnWindow.ReactNativeWebView &&
-                    rnWindow.ReactNativeWebView.postMessage
-                ) {
-                    try {
-                        rnWindow.ReactNativeWebView.postMessage(
-                            JSON.stringify(syncStateAction)
-                        );
-                    } catch (err) {
-                        if (onError) {
-                            onError(err);
+            try {
+                const origin =
+                    document.location.origin || window.location.origin;
+                if (!action.isBubbled) {
+                    const syncStateAction = createSyncStateAction(
+                        { ...action, isBubbled: true },
+                        SYNC_STATE_ACTION_SOURCE_WEBAPP
+                    );
+                    window.postMessage(syncStateAction, origin);
+                    const rnWindow = window as ReactNativeWebviewWindow;
+                    if (
+                        rnWindow.ReactNativeWebView &&
+                        rnWindow.ReactNativeWebView.postMessage
+                    ) {
+                        try {
+                            rnWindow.ReactNativeWebView.postMessage(
+                                JSON.stringify(syncStateAction)
+                            );
+                        } catch (err) {
+                            if (onError) {
+                                onError(err);
+                            }
                         }
                     }
+                }
+            } catch (err) {
+                if (onError) {
+                    onError(err);
                 }
             }
         },

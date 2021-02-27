@@ -36,7 +36,7 @@ describe("Given usePostMessageCallback", () => {
         jest.clearAllMocks();
     });
 
-    it("when called, then hook calls listenOnDispatchWillBeCalled in context", async () => {
+    it("when called, then hook returns function", async () => {
         const testOptions: SharedStateHookOptions = {};
         const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
             ActionTypeguard<TestActionClass>

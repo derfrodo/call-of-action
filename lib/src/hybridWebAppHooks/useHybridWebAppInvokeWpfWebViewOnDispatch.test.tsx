@@ -39,6 +39,18 @@ const makeWrapper = (): React.FC<any> => ({ children }): React.ReactElement => (
 type TestActionClass = { isBubbled?: boolean };
 
 const notifyMock = jest.fn();
+const addNotifyMockToWindow = () => {
+    if ((window as any).external) {
+        (window as any).external.notify = notifyMock;
+    } else {
+        (window as any).external = { notify: notifyMock };
+    }
+};
+const removeNotifyMockToWindow = () => {
+    if ((window as any).external) {
+        (window as any).external.notify = undefined;
+    }
+};
 
 describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
     beforeEach(() => {
@@ -53,6 +65,7 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
     });
 
     afterEach(() => {
+        removeNotifyMockToWindow();
         jest.clearAllMocks();
     });
 
@@ -190,12 +203,7 @@ describe("Given useHybridWebAppInvokeWpfWebViewOnDispatch", () => {
         });
         it("... and action is not bubbled, then callback calls wpf notify function", async () => {
             const testAction: TestActionClass = { isBubbled: false };
-            if ((window as any).external) {
-                (window as any).external.notify = notifyMock;
-            } else {
-                (window as any).external = { notify: notifyMock };
-            }
-
+            addNotifyMockToWindow();
             onDispatch(testAction);
 
             expect(notifyMock).toBeCalled();

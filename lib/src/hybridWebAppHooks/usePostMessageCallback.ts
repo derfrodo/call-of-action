@@ -29,6 +29,7 @@ export const usePostMessageCallback: UsePostMessageCallback = <
 
                 if (origin !== window.location.origin) {
                     console.debug("Processing posted event: Origin differs", {
+                        currentOrigin: window.location.origin,
                         eventOrigin: origin,
                     });
                     return;
@@ -43,7 +44,7 @@ export const usePostMessageCallback: UsePostMessageCallback = <
 
                 const action = asSyncStateAction(data, isActionTypeguard);
                 if (action !== null) {
-                    onMessage(action);
+                    return onMessage(action);
                 }
             } catch (err) {
                 console.error("Processing post event failed", { error: err });

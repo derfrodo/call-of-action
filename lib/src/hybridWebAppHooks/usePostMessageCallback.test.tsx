@@ -53,6 +53,7 @@ describe("Given usePostMessageCallback", () => {
     });
 
     describe("when called and function returned", () => {
+        const testAction: TestActionClass = { isBubbled: true };
         const testOptions: SharedStateHookOptions = {};
         const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
             ActionTypeguard<TestActionClass>
@@ -67,7 +68,14 @@ describe("Given usePostMessageCallback", () => {
                 wrapper: makeWrapper(),
                 initialProps: [onMessage, isActionTypeguard, testOptions],
             });
-            expect(typeof result.current).toBe("function");
+            const r = result.current(
+                new MessageEvent("message", {
+                    source: window,
+                    origin: "",
+                    data: testAction,
+                })
+            );
+            // expect(typeof result.current).toBe("function");
         });
     });
 });

@@ -26,12 +26,14 @@ export const usePostMessageCallback: UsePostMessageCallback = <
         (event: MessageEvent) => {
             try {
                 const { data, origin, source } = event;
+
                 if (origin !== window.location.origin) {
                     console.debug("Processing posted event: Origin differs", {
                         eventOrigin: origin,
                     });
                     return;
                 }
+
                 if (skipCompareSourceToWindow !== true && source !== window) {
                     console.debug("Processing posted event: Source differs", {
                         eventOrigin: origin,

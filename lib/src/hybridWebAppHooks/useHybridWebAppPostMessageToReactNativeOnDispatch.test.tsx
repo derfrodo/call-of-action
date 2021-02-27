@@ -9,7 +9,7 @@ import {
 } from "../types";
 import { useConsumeSyncStateActionPostMessages } from "./useHybridWebAppConsumeSyncStateActionPostMessages";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
-import { createSyncStateAction } from "../syncState/syncState";
+import { createSyncStateAction } from "../syncState/createSyncStateAction";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "..";
 
 jest.mock("./useHybridWebAppConsumeSyncStateActionPostMessages", () => ({
@@ -17,8 +17,8 @@ jest.mock("./useHybridWebAppConsumeSyncStateActionPostMessages", () => ({
     useConsumeSyncStateActionPostMessages: jest.fn(),
 }));
 
-jest.mock("../syncState/syncState", () => {
-    const act = jest.requireActual("../syncState/syncState");
+jest.mock("../syncState/createSyncStateAction", () => {
+    const act = jest.requireActual("../syncState/createSyncStateAction");
     return {
         ...act,
         createSyncStateAction: jest.fn(),

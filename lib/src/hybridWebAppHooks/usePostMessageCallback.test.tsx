@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-hooks";
 import React from "react";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "..";
-import { asSyncStateAction } from "../syncState/syncState";
+import { asSyncStateAction } from "../syncState/asSyncStateAction";
 import {
     ActionTypeguard,
     PostMessageCallbackoptions,
@@ -10,8 +10,8 @@ import {
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { usePostMessageCallback } from "./usePostMessageCallback";
 
-jest.mock("../syncState/syncState", () => {
-    const act = jest.requireActual("../syncState/syncState");
+jest.mock("../syncState/asSyncStateAction", () => {
+    const act = jest.requireActual("../syncState/asSyncStateAction");
     return {
         ...act,
         asSyncStateAction: jest.fn(),

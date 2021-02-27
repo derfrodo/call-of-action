@@ -1,25 +1,6 @@
-import {
-    SYNC_STATE_ACTION_TYPE,
-    SYNC_STATE_ACTION_SOURCE_WEBAPP,
-    SYNC_STATE_ACTION_SOURCE_FRAME,
-} from "../constants";
-import type { SyncStateAction, SyncActionSources } from "../types";
+import type { SyncStateAction } from "../types";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
-
-export const isSyncStateAction = <T>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    obj: any,
-    payloadTypeGuard: ActionTypeguard<T>
-): obj is SyncStateAction<T> => {
-    return (
-        typeof obj === "object" &&
-        obj !== null &&
-        obj.type === SYNC_STATE_ACTION_TYPE &&
-        (obj.source === SYNC_STATE_ACTION_SOURCE_WEBAPP ||
-            obj.source === SYNC_STATE_ACTION_SOURCE_FRAME) &&
-        payloadTypeGuard(obj.payload)
-    );
-};
+import { isSyncStateAction } from "./isSyncStateAction";
 
 export const asSyncStateAction = <T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,15 +27,4 @@ export const asSyncStateAction = <T>(
         });
     }
     return null;
-};
-
-export const createSyncStateAction = <T>(
-    action: T,
-    source: SyncActionSources
-): SyncStateAction<T> => {
-    return {
-        type: SYNC_STATE_ACTION_TYPE,
-        source,
-        payload: action,
-    };
 };

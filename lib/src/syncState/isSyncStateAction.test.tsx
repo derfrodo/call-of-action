@@ -5,7 +5,7 @@ import {
 } from "../constants";
 import { ActionTypeguard, SyncActionSources, SyncStateAction } from "../types";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
-import { isSyncStateAction } from "./syncState";
+import { isSyncStateAction } from "./isSyncStateAction";
 
 type TestActionClass = { isBubbled?: boolean };
 

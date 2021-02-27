@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
-import { createSyncStateAction } from "../syncState/syncState";
+import { createSyncStateAction } from "../syncState/createSyncStateAction";
 import type { ContextAction } from "../types/ContextAction";
 import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
 import type { OnContextDispatchWillBeCalled } from "../types/OnContextDispatchWillBeCalled";

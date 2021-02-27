@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { asSyncStateAction } from "../syncState/syncState";
+import { asSyncStateAction } from "../syncState/isSyncStateAction";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
 import type { ContextAction } from "../types/ContextAction";
 import type { ReactNativeOnMessageEvent } from "../types/ReactNativeOnMessageEvent";

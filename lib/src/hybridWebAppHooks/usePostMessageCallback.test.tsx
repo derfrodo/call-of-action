@@ -63,6 +63,28 @@ describe("Given usePostMessageCallback", () => {
             ActionTypeguard<TestActionClass>
         >;
         const onMessage = jest.fn();
+        it(`... and onMessage will throw an error.`, async () => {
+            onMessage.mockImplementation(() => {
+                throw "TESTERROR";
+            });
+            const { result } = renderHook<
+                Parameters<typeof usePostMessageCallback>,
+                ReturnType<typeof usePostMessageCallback>
+            >((args) => usePostMessageCallback(...args), {
+                wrapper: makeWrapper(),
+                initialProps: [onMessage, isActionTypeguard, testOptions],
+            });
+
+            await result.current(
+                new MessageEvent("message", {
+                    source: window,
+                    origin: window.location.origin,
+                    data: testAction,
+                })
+            );
+
+            expect(testOptions.onError).toBeCalledWith("TESTERROR");
+        });
 
         describe.each<[boolean, boolean, boolean, boolean]>([
             [true, true, true, false],

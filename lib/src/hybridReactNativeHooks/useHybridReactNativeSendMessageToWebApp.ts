@@ -2,15 +2,8 @@ import { useCallback } from "react";
 import { SYNC_STATE_ACTION_SOURCE_FRAME } from "../constants";
 import { createSyncStateAction } from "../syncState/createSyncStateAction";
 import type { ContextAction } from "../types/ContextAction";
-import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
 import type { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";
 import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
-
-type UseHybridReactNativeWebViewOnMessage = <T extends ContextAction>(
-    webViewRef: ReactNativeWebViewRef,
-    context: PostMessageToReactNativeContext<T>,
-    options?: SharedStateHookOptions
-) => void;
 
 export const useHybridReactNativeSendMessageToWebApp = <
     T extends ContextAction
@@ -34,7 +27,7 @@ export const useHybridReactNativeSendMessageToWebApp = <
         })`;
     }, []);
 
-    const { onError } = options || {};
+    const { onError, onWarn } = options || {};
     return useCallback(
         async (action: T) => {
             try {
@@ -43,6 +36,14 @@ export const useHybridReactNativeSendMessageToWebApp = <
                     console.warn(
                         "Can not inject javascript into webview. No webview has been resolved."
                     );
+
+                    if (onWarn) {
+                        onWarn({
+                            code: "NO_WEBVIEW",
+                            message:
+                                "Can not inject javascript into webview. No webview has been resolved.",
+                        });
+                    }
                 } else {
                     const js = createPostMessageJavascriptCode(action);
                     await current.injectJavaScript(js);

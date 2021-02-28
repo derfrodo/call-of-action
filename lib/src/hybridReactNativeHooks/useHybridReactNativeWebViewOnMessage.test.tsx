@@ -2,11 +2,7 @@ import { renderHook } from "@testing-library/react-hooks";
 import React from "react";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "..";
 import { asSyncStateAction } from "../syncState/asSyncStateAction";
-import {
-    ActionTypeguard,
-    PostMessageCallbackoptions,
-    SyncStateAction,
-} from "../types";
+import { ActionTypeguard, SyncStateAction } from "../types";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { useHybridReactNativeWebViewOnMessage } from "./useHybridReactNativeWebViewOnMessage";
 

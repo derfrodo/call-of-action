@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { SYNC_STATE_ACTION_SOURCE_FRAME } from "../constants";
-import { createSyncStateAction } from "../syncState/isSyncStateAction";
+import { createSyncStateAction } from "../syncState/createSyncStateAction";
 import type { ContextAction } from "../types/ContextAction";
 import type { PostMessageToReactNativeContext } from "../types/IPostMessageToReactNativeContext";
 import type { ReactNativeWebViewRef } from "../types/ReactNativeWebViewRef";

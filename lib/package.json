@@ -11,6 +11,7 @@
         "prepareForPublish": "npm run build && npm install --production && npm run cleanForPublish",
         "cleanForPublish": "node cleanForPublish.js",
         "test": "jest",
+        "test:coverage": "jest --coverage",
         "test:watch": "jest --watchAll",
         "clean": "npm ci && node clean.js && npm run installPeerDependencies",
         "build": "tsc --project tsconfig.build.json",

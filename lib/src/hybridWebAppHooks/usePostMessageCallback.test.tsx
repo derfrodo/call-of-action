@@ -5,6 +5,7 @@ import { asSyncStateAction } from "../syncState/asSyncStateAction";
 import {
     ActionTypeguard,
     PostMessageCallbackoptions,
+    SyncActionSources,
     SyncStateAction,
 } from "../types";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
@@ -175,5 +176,62 @@ describe("Given usePostMessageCallback", () => {
                 });
             }
         );
+
+        it(`skips when skippedSources option is set.`, async () => {
+            const options: PostMessageCallbackoptions = {
+                ...testOptions,
+                skipSources: [SyncActionSources.INNER_APP],
+            };
+            const { result } = renderHook<
+                Parameters<typeof usePostMessageCallback>,
+                ReturnType<typeof usePostMessageCallback>
+            >((args) => usePostMessageCallback(...args), {
+                wrapper: makeWrapper(),
+                initialProps: [onMessage, isActionTypeguard, options],
+            });
+            const testAction: SyncStateAction<string> = {
+                payload: "TESTPAYLOAD",
+                source: SyncActionSources.INNER_APP,
+                type: "SyncStateAction",
+            };
+            asSyncStateActionMock.mockImplementation((action) => testAction);
+            await result.current(
+                new MessageEvent("message", {
+                    source: window,
+                    origin: window.location.origin,
+                    data: testAction,
+                })
+            );
+            expect(asSyncStateActionMock).toBeCalledTimes(1);
+            expect(onMessage).toBeCalledTimes(0);
+        });
+        it(`does not skip if origin is not equal, when ignore different origins option is set.`, async () => {
+            const options: PostMessageCallbackoptions = {
+                ...testOptions,
+                ignoreDifferentOrigins: true
+            };
+            const { result } = renderHook<
+                Parameters<typeof usePostMessageCallback>,
+                ReturnType<typeof usePostMessageCallback>
+            >((args) => usePostMessageCallback(...args), {
+                wrapper: makeWrapper(),
+                initialProps: [onMessage, isActionTypeguard, options],
+            });
+            const testAction: SyncStateAction<string> = {
+                payload: "TESTPAYLOAD",
+                source: SyncActionSources.INNER_APP,
+                type: "SyncStateAction",
+            };
+            asSyncStateActionMock.mockImplementation((action) => testAction);
+            await result.current(
+                new MessageEvent("message", {
+                    source: window,
+                    origin: "fakeOrigin",
+                    data: testAction,
+                })
+            );
+            expect(asSyncStateActionMock).toBeCalledTimes(1);
+            expect(onMessage).toBeCalledTimes(1);
+        });
     });
 });

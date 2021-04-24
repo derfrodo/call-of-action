@@ -1,15 +1,18 @@
-import { useCallback, Dispatch } from "react";
+import { Dispatch, useCallback } from "react";
+import { isReturnStatement } from "typescript";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
-import { useConsumeSyncStateActionPostMessages } from "./useHybridWebAppConsumeSyncStateActionPostMessages";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
 import type { ContextAction } from "../types/ContextAction";
-import type { SharedStateHookOptions } from "../types/SharedStateHookOptions";
+import { PostMessageCallbackoptions } from "../types/PostMessageCallbackoptions";
 import type { SyncStateAction } from "../types/SyncStateAction";
+import { useConsumeSyncStateActionPostMessages } from "./useHybridWebAppConsumeSyncStateActionPostMessages";
+
+type HybridWebAppDispatchOnPostMessagesOptions = PostMessageCallbackoptions;
 
 type UseHybridWebAppDispatchOnPostMessages = <T extends ContextAction>(
     dispatch: Dispatch<T>,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: SharedStateHookOptions
+    options?: HybridWebAppDispatchOnPostMessagesOptions
 ) => void;
 
 /**
@@ -21,16 +24,23 @@ export const useHybridWebAppDispatchOnPostMessages: UseHybridWebAppDispatchOnPos
 >(
     dispatch: React.Dispatch<T>,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: SharedStateHookOptions
+    options?: HybridWebAppDispatchOnPostMessagesOptions
 ) => {
-    const { onError } = options || {};
+    const { onError, skipSources } = options || {};
     const callback = useCallback(
         (action: SyncStateAction<T>) => {
             try {
-                if (
-                    action &&
-                    action.source !== SYNC_STATE_ACTION_SOURCE_WEBAPP
-                ) {
+                const sourcesToIgnore = skipSources || [
+                    SYNC_STATE_ACTION_SOURCE_WEBAPP,
+                ];
+
+                if (action) {
+                    const { source } = action;
+                    for (const src of sourcesToIgnore) {
+                        if (source === src) {
+                            return;
+                        }
+                    }
                     dispatch(action.payload);
                 }
             } catch (err) {

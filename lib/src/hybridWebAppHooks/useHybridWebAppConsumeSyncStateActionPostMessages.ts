@@ -5,12 +5,14 @@ import type { ContextAction } from "../types/ContextAction";
 import type { SyncStateAction } from "../types/SyncStateAction";
 import { usePostMessageCallback } from "./usePostMessageCallback";
 
+type HybridWebAppConsumeSyncStateActionPostMessagesOptions = PostMessageCallbackoptions;
+
 type UseHybridWebAppConsumeSyncStateActionPostMessages = <
     T extends ContextAction
 >(
     onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: PostMessageCallbackoptions
+    options?: HybridWebAppConsumeSyncStateActionPostMessagesOptions
 ) => void;
 
 /**
@@ -22,7 +24,7 @@ export const useHybridWebAppConsumeSyncStateActionPostMessages: UseHybridWebAppC
 >(
     onMessage: (action: SyncStateAction<T>) => Promise<void> | void,
     isActionTypeguard: ActionTypeguard<T>,
-    options?: PostMessageCallbackoptions
+    options?: HybridWebAppConsumeSyncStateActionPostMessagesOptions
 ) => {
     const postMessageCallback = usePostMessageCallback(
         onMessage,

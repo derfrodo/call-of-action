@@ -51,22 +51,23 @@ export const usePostMessageCallback: UsePostMessageCallback = <
 
                 const action = asSyncStateAction(data, isActionTypeguard);
 
-                if (skipSources) {
-                    for (const source in skipSources) {
-                        if (action?.source === source) {
-                            console.debug(
-                                `Skipping action due to ignored action-source "${action.source}".`,
-                                {
-                                    eventOrigin: origin,
-                                    action,
-                                }
-                            );
-                            return;
+                if (action !== null) {
+                    if (skipSources) {
+                        const { source } = action;
+                        for (const src of skipSources) {
+                            if (source === src) {
+                                console.debug(
+                                    `Skipping action due to ignored action-source "${action.source}".`,
+                                    {
+                                        eventOrigin: origin,
+                                        action,
+                                    }
+                                );
+                                return;
+                            }
                         }
                     }
-                }
 
-                if (action !== null) {
                     return onMessage(action);
                 }
             } catch (err) {

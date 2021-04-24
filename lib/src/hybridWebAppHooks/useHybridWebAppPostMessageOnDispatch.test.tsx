@@ -5,6 +5,7 @@ import {
     ActionTypeguard,
     OnContextDispatchWillBeCalled,
     PostMessageToReactNativeContext,
+    SyncActionSources,
     SyncStateAction,
     UseHybridWebAppPostMessageOnDispatchOptions,
 } from "../types";
@@ -147,6 +148,74 @@ describe("Given useHybridWebAppPostMessageOnDispatch", () => {
         );
     });
 
+    it("when called and onDispatch is called and action is not bubbled and specific source is not set, then callback calls notify function webapp source", async () => {
+        const testAction: TestActionClass = { isBubbled: false };
+        addPostMessageMockToWindow();
+
+        const testOptions: UseHybridWebAppPostMessageOnDispatchOptions = {
+            onError: jest.fn(),
+        };
+        const context: PostMessageToReactNativeContext<TestActionClass> = {
+            dispatch: jest.fn(),
+            listenOnDispatchWillBeCalled: jest.fn(),
+            removeOnDispatchWillBeCalled: jest.fn(),
+        };
+        const {} = renderHook(
+            () => useHybridWebAppPostMessageOnDispatch(context, testOptions),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+        const onDispatch = (context.listenOnDispatchWillBeCalled as jest.MockedFunction<
+            typeof context.listenOnDispatchWillBeCalled
+        >).mock.calls[0][0];
+
+        onDispatch(testAction);
+
+        expect(notifyMock).toBeCalledWith(
+            JSON.stringify({
+                payload: "TESTPAYLOAD",
+                source: SyncActionSources.WEB_APP,
+                type: "SyncStateAction",
+            }),
+            expect.any(String)
+        );
+    });
+it("when called and onDispatch is called and action is not bubbled and specific source is set, then callback calls notify function with source", async () => {
+        const testAction: TestActionClass = { isBubbled: false };
+        addPostMessageMockToWindow();
+
+        const testOptions: UseHybridWebAppPostMessageOnDispatchOptions = {
+            onError: jest.fn(),
+            syncActionSource: SyncActionSources.INNER_APP,
+        };
+        const context: PostMessageToReactNativeContext<TestActionClass> = {
+            dispatch: jest.fn(),
+            listenOnDispatchWillBeCalled: jest.fn(),
+            removeOnDispatchWillBeCalled: jest.fn(),
+        };
+        const {} = renderHook(
+            () => useHybridWebAppPostMessageOnDispatch(context, testOptions),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+        const onDispatch = (context.listenOnDispatchWillBeCalled as jest.MockedFunction<
+            typeof context.listenOnDispatchWillBeCalled
+        >).mock.calls[0][0];
+
+        onDispatch(testAction);
+
+        expect(notifyMock).toBeCalledWith(
+            JSON.stringify({
+                payload: "TESTPAYLOAD",
+                source: SyncActionSources.INNER_APP,
+                type: "SyncStateAction",
+            }),
+            expect.any(String)
+        );
+    });
+
     describe("when called and onDispatch is called", () => {
         const context: PostMessageToReactNativeContext<TestActionClass> = {
             dispatch: jest.fn(),
@@ -197,7 +266,7 @@ describe("Given useHybridWebAppPostMessageOnDispatch", () => {
                 SYNC_STATE_ACTION_SOURCE_WEBAPP
             );
         });
-        it("... and action is not bubbled, then callback calls wpf notify function", async () => {
+        it("... and action is not bubbled, then callback calls notify function", async () => {
             const testAction: TestActionClass = { isBubbled: false };
             addPostMessageMockToWindow();
             onDispatch(testAction);

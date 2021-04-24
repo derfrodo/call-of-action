@@ -1,7 +1,7 @@
 import React from "react";
 import { useHybridWebAppDispatchOnPostMessages } from "./useHybridWebAppDispatchOnPostMessages";
 import { renderHook } from "@testing-library/react-hooks";
-import { ActionTypeguard, SyncStateAction } from "../types";
+import { ActionTypeguard, SyncActionSources, SyncStateAction } from "../types";
 import { useConsumeSyncStateActionPostMessages } from "./useHybridWebAppConsumeSyncStateActionPostMessages";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { createSyncStateAction } from "../syncState";
@@ -127,6 +127,86 @@ describe("Given useHybridWebAppDispatchOnPostMessages", () => {
         await callback(action);
         expect(dispatch).not.toBeCalled();
     });
+
+    it("when called and an action with SyncState TestAction from InnerApp happens, then passed callback does call dispatch for this testaction", async () => {
+        const dispatch = jest.fn<
+            ReturnType<React.Dispatch<TestActionClass>>,
+            Parameters<React.Dispatch<TestActionClass>>
+        >();
+
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        const testOptions: SharedStateHookOptions = {};
+
+        const {} = renderHook(
+            () =>
+                useHybridWebAppDispatchOnPostMessages(
+                    dispatch,
+                    isActionTypeguard,
+                    testOptions
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+
+        const callback =
+            useConsumeSyncStateActionPostMessagesMock.mock.calls[0][0];
+        const action: SyncStateAction<TestActionClass> = createSyncStateAction<
+            TestActionClass
+        >(
+            {
+                isBubbled: true,
+            },
+            SyncActionSources.INNER_APP
+        );
+
+        await callback(action);
+        expect(dispatch).toBeCalled();
+    });
+
+    it("when called and an action with SyncState TestAction from InnerApp happens and InnerApp is ignored by option, then passed callback doesnt call dispatch for this testaction", async () => {
+        const dispatch = jest.fn<
+            ReturnType<React.Dispatch<TestActionClass>>,
+            Parameters<React.Dispatch<TestActionClass>>
+        >();
+
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        const testOptions: SharedStateHookOptions = {};
+
+        const {} = renderHook(
+            () =>
+                useHybridWebAppDispatchOnPostMessages(
+                    dispatch,
+                    isActionTypeguard,
+                    {
+                        ...testOptions,
+                        skipSources: [SyncActionSources.INNER_APP],
+                    }
+                ),
+            {
+                wrapper: makeWrapper(),
+            }
+        );
+
+        const callback =
+            useConsumeSyncStateActionPostMessagesMock.mock.calls[0][0];
+        const action: SyncStateAction<TestActionClass> = createSyncStateAction<
+            TestActionClass
+        >(
+            {
+                isBubbled: true,
+            },
+            SyncActionSources.INNER_APP
+        );
+
+        await callback(action);
+        expect(dispatch).not.toBeCalled();
+    });
+
     it("when called and an action with SyncState TestAction from frame happens, then passed callback calls dispatch for this testaction", async () => {
         const dispatch = jest.fn<
             ReturnType<React.Dispatch<TestActionClass>>,

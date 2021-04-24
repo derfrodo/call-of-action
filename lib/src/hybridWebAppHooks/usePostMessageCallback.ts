@@ -18,8 +18,12 @@ export const usePostMessageCallback: UsePostMessageCallback = <
     isActionTypeguard: ActionTypeguard<T>,
     postMessageCallbackOptions?: PostMessageCallbackoptions
 ) => {
-    const { onError, skipCompareSourceToWindow } =
-        postMessageCallbackOptions || {};
+    const {
+        onError,
+        skipCompareSourceToWindow,
+        ignoreDifferentOrigins,
+        skipSources,
+    } = postMessageCallbackOptions || {};
     const postMessageCallback = useCallback<
         (event: MessageEvent) => void | Promise<void>
     >(
@@ -27,7 +31,10 @@ export const usePostMessageCallback: UsePostMessageCallback = <
             try {
                 const { data, origin, source } = event;
 
-                if (origin !== window.location.origin) {
+                if (
+                    ignoreDifferentOrigins !== true &&
+                    origin !== window.location.origin
+                ) {
                     console.debug("Processing posted event: Origin differs", {
                         currentOrigin: window.location.origin,
                         eventOrigin: origin,
@@ -43,6 +50,22 @@ export const usePostMessageCallback: UsePostMessageCallback = <
                 }
 
                 const action = asSyncStateAction(data, isActionTypeguard);
+
+                if (skipSources) {
+                    for (const source in skipSources) {
+                        if (action?.source === source) {
+                            console.debug(
+                                `Skipping action due to ignored action-source "${action.source}".`,
+                                {
+                                    eventOrigin: origin,
+                                    action,
+                                }
+                            );
+                            return;
+                        }
+                    }
+                }
+
                 if (action !== null) {
                     return onMessage(action);
                 }

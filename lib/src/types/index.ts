@@ -9,3 +9,4 @@ export * from "./WpfWebviewWindow";
 export * from "./ReactNativeOnMessageEvent";
 export * from "./ActionTypeguard";
 export * from "./PostMessageCallbackoptions";
+export * from "./UseHybridWebAppPostMessageOnDispatchOptions";

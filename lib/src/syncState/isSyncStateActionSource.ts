@@ -1,6 +1,7 @@
 import { SyncActionSources } from "..";
 
 export const isSyncStateActionSource = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     source: any
 ): source is SyncActionSources => {
     return (

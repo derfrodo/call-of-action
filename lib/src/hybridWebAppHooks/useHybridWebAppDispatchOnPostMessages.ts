@@ -1,5 +1,4 @@
 import { Dispatch, useCallback } from "react";
-import { isReturnStatement } from "typescript";
 import { SYNC_STATE_ACTION_SOURCE_WEBAPP } from "../constants";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
 import type { ContextAction } from "../types/ContextAction";

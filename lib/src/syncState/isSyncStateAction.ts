@@ -1,10 +1,7 @@
-import {
-    SYNC_STATE_ACTION_SOURCE_FRAME,
-    SYNC_STATE_ACTION_SOURCE_WEBAPP,
-    SYNC_STATE_ACTION_TYPE,
-} from "../constants";
-import type { SyncStateAction } from "../types";
+import { SYNC_STATE_ACTION_TYPE } from "../constants";
+import { SyncStateAction } from "../types";
 import type { ActionTypeguard } from "../types/ActionTypeguard";
+import { isSyncStateActionSource } from "./isSyncStateActionSource";
 
 export const isSyncStateAction = <T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,8 +12,7 @@ export const isSyncStateAction = <T>(
         typeof obj === "object" &&
         obj !== null &&
         obj.type === SYNC_STATE_ACTION_TYPE &&
-        (obj.source === SYNC_STATE_ACTION_SOURCE_WEBAPP ||
-            obj.source === SYNC_STATE_ACTION_SOURCE_FRAME) &&
+        isSyncStateActionSource(obj.source) &&
         payloadTypeGuard(obj.payload)
     );
 };

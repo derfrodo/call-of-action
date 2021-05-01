@@ -6,9 +6,18 @@ import {
 import { ActionTypeguard, SyncActionSources, SyncStateAction } from "../types";
 import { SharedStateHookOptions } from "../types/SharedStateHookOptions";
 import { isSyncStateAction } from "./isSyncStateAction";
+import { isSyncStateActionSource } from "./isSyncStateActionSource";
+
+jest.mock("./isSyncStateActionSource", ()=>{
+    jest.requireActual("./isSyncStateActionSource")
+    return{
+        isSyncStateActionSource: jest.fn()
+    }
+})
 
 type TestActionClass = { isBubbled?: boolean };
 
+const isSyncStateActionSourceMock = isSyncStateActionSource as jest.MockedFunction<typeof isSyncStateActionSource>
 const getSyncStateAction = (
     payload: any,
     source: SyncActionSources = SYNC_STATE_ACTION_SOURCE_WEBAPP
@@ -18,12 +27,33 @@ const getSyncStateAction = (
     payload,
 });
 describe("Given isSyncStateAction", () => {
-    beforeEach(() => {});
+    beforeEach(() => {
+        isSyncStateActionSourceMock.mockImplementation(()=>true)
+    });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
-
+    it(`when is no valid sync state action source, then result is false.`, async () => {
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        isSyncStateActionSourceMock.mockImplementation(()=>false)
+        isActionTypeguard.mockImplementation(() => true);
+        const action = getSyncStateAction("pload");
+        const result = isSyncStateAction(action, isActionTypeguard);
+        expect(result).toBe(false);
+    });
+    it(`when is valid sync state action source, then result is true.`, async () => {
+        const isActionTypeguard = (jest.fn() as unknown) as jest.MockedFunction<
+            ActionTypeguard<TestActionClass>
+        >;
+        isSyncStateActionSourceMock.mockImplementation(()=>true)
+        isActionTypeguard.mockImplementation(() => true);
+        const action = getSyncStateAction("pload");
+        const result = isSyncStateAction(action, isActionTypeguard);
+        expect(result).toBe(true);
+    });
     describe.each<[any, boolean, boolean]>([
         [getSyncStateAction("TESTPAYLOAD"), true, true],
         [getSyncStateAction("TESTPAYLOAD"), false, false],
